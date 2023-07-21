@@ -16,6 +16,11 @@ const ExpenseForm = (props) => {
     inputDate: new Date(),
   });
 
+  // Validate
+  const [isValidTitle, setIsValidTitle] = useState(true);
+  const [isValidAmount, setIsValidAmount] = useState(true);
+  const [isValidDate, setIsValidDate] = useState(true);
+
   const saveExpenseDataHandler = props?.saveExpenseDataHandler;
 
   const titleChangeHandler = (e) => {
@@ -40,21 +45,34 @@ const ExpenseForm = (props) => {
   const submitHandler = (e) => {
     e.preventDefault();
 
+    if (title.trim().length === 0) {
+      setIsValidTitle(false);
+      return;
+    }
+
+    if (amount.trim().length === 0 || isNaN(amount)) {
+      setIsValidAmount(false);
+      return;
+    }
+
+    if (!(date instanceof Date && !isNaN(date))) {
+      setIsValidDate(false);
+      return;
+    }
+
     const expenseDate = {
       title,
-      amount,
+      amount: Number(amount),
       date,
     };
-    console.log(
-      `ExpenseForm.js: line 39 🐱‍🚀❄🐱‍🏍 expenseDate ===>`,
-      expenseDate
-    );
 
     saveExpenseDataHandler(expenseDate);
 
     setTitle("");
     setAmount("");
     setDate(new Date());
+    setIsValidTitle(true);
+    setIsValidAmount(true);
   };
 
   return (
@@ -70,16 +88,21 @@ const ExpenseForm = (props) => {
               // onChange={(e) => setTitle(e.target.value)}
               // value={expense.title}
               onChange={titleChangeHandler}
+              error={!isValidTitle}
+              helperText={isValidTitle ? "" : "Please input the title"}
             />
             <TextField
               id="expense-form-amount"
               label="Amount"
               variant="outlined"
-              type="number"
+              // type="number"
               value={amount}
               // onChange={(e) => setAmount(e.target.value)}
               // value={expense.amount}
               onChange={amountChangeHandler}
+              // inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              error={!isValidAmount}
+              helperText={!isValidAmount ? "Please input the amount" : ""}
             />
             <DesktopDatePicker
               label="Date desktop"
@@ -88,7 +111,13 @@ const ExpenseForm = (props) => {
               // onChange={handleChange}
               // value={expense.inputDate}
               onChange={dateChangeHandler}
-              renderInput={(params) => <TextField {...params} />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  error={!isValidDate}
+                  helperText={isValidDate ? "Please input the valid date" : ""}
+                />
+              )}
             />
           </Stack>
 

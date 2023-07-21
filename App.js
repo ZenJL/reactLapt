@@ -2,7 +2,15 @@ import logo from "./logo.svg";
 import "./App.css";
 import Expense from "./components/Expense/Expense";
 import NewExpense from "./components/NewExpense/NewExpense";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Navigation from "./components/Navigation/Navigation";
+import Login from "./components/Login/Login";
+
+const initialExpenses = [
+  { id: 1, title: "Petrol Gas", amount: 2, date: new Date(2023, 7, 3) },
+  { id: 2, title: "Movie", amount: 10, date: new Date(2023, 10, 3) },
+  { id: 3, title: "Lunch", amount: 5, date: new Date(2023, 12, 3) },
+];
 
 function App() {
   // let listExpense = [
@@ -10,45 +18,37 @@ function App() {
   //   { id: 2, title: "Movie", amount: 10, date: new Date(2023, 10, 3) },
   //   { id: 3, title: "Lunch", amount: 5, date: new Date(2023, 12, 3) },
   // ];
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const [listExpense, setListExpense] = useState([
-    { id: 1, title: "Petrol Gas", amount: 2, date: new Date(2023, 7, 3) },
-    { id: 2, title: "Movie", amount: 10, date: new Date(2023, 10, 3) },
-    { id: 3, title: "Lunch", amount: 5, date: new Date(2023, 12, 3) },
-  ]);
+  const [listExpense, setListExpense] = useState(initialExpenses);
 
-  const getValueApp = (data) => {
-    console.log(`App.js: line 14 🐱‍🚀❄🐱‍🏍 data ===>`);
-
-    setListExpense((prev) => [...prev, data]);
+  const addExpenseHandler = (expense) => {
+    setListExpense((prev) => [...prev, expense]);
   };
 
-  console.log(
-    `App.js: line 17 🐱‍🚀❄🐱‍🏍 listExpenselistExpense ===>`,
-    listExpense
-  );
+  // Login
+  const loginHandler = ({ username = "", password = "" }) => {
+    // To-do: connect API & check username & password
+    setIsLoggedIn(true);
+    localStorage.setItem("isLoggedInStatus", "1");
+  };
 
-  return (
-    // <div className="App">
-    //   <header className="App-header">
-    //     <img src={logo} className="App-logo" alt="logo" />
-    //     <p>
-    //       Edit <code>src/App.js</code> and save to reload.
-    //     </p>
-    //     <a
-    //       className="App-link"
-    //       href="https://reactjs.org"
-    //       target="_blank"
-    //       rel="noopener noreferrer"
-    //     >
-    //       Learn React
-    //     </a>
-    //   </header>
-    // </div>
+  // Logout
+  const logoutHandler = () => {
+    setIsLoggedIn(false);
+  };
 
-    <>
-      <NewExpense getValueApp={getValueApp} />
+  const itemLocalStorage = localStorage.getItem("isLoggedInStatus");
 
+  useEffect(() => {
+    if (itemLocalStorage === "1") {
+      setIsLoggedIn(true);
+    }
+  }, [itemLocalStorage]);
+
+  return isLoggedIn ? (
+    <Navigation logoutHandler={logoutHandler}>
+      <NewExpense getValueApp={addExpenseHandler} />
       <Expense expense={listExpense}>
         {/* <ExpenseItem
           title={listExpense[0].title}
@@ -57,7 +57,9 @@ function App() {
           listExpense={listExpense}
         /> */}
       </Expense>
-    </>
+    </Navigation>
+  ) : (
+    <Login loginHandler={loginHandler} />
   );
 }
 
