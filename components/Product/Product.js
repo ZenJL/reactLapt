@@ -1,20 +1,17 @@
 import React, { useState } from "react";
-import ExpenseItem from "./ExpenseItem";
-import "./Expense.css";
+import ExpenseItem from "./ProductItem";
+import "./Product.css";
 import Card from "../UI/Card";
-import ExpenseFilter from "./ExpenseFilter";
+import ExpenseFilter from "./ProductFilter";
 import { Button } from "@mui/base";
 import { Box } from "@mui/material";
 
-const Expense = (props) => {
+const Product = (props) => {
   const { expense: dataList } = props;
 
   const [dataShow, setDataShow] = useState(props.expense);
 
   const selectedYearHandle = (value) => {
-    console.log(`Expense.js: line 9 🐱‍🚀❄🐱‍🏍 item expense ===>`, value);
-    console.log(`Expense.js: line 11 🐱‍🚀❄🐱‍🏍 dataList ===>`, dataList);
-
     const newData = dataList?.filter(
       (item, idx) => item.date.getFullYear() === value
     );
@@ -44,7 +41,7 @@ const Expense = (props) => {
               textAlign: "center",
             }}
           >
-            Khong co du lieu
+            Không có dữ liệu
           </h1>
         )
       }
@@ -52,4 +49,4 @@ const Expense = (props) => {
   );
 };
 
-export default Expense;
+export default Product;

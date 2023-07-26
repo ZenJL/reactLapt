@@ -1,10 +1,8 @@
 import React from "react";
-import ExpenseForm from "./ExpenseForm";
+import ExpenseForm from "./ProductForm";
 
-const NewExpense = (props) => {
+const NewProduct = (props) => {
   const saveExpenseDataHandler = (data) => {
-    console.log(`NewExpense.js: line 6 🐱‍🚀❄🐱‍🏍 data ===>`, data);
-
     const newExpenseData = { ...data, id: Math.random() };
     props.getValueApp(newExpenseData);
   };
@@ -12,4 +10,4 @@ const NewExpense = (props) => {
   return <ExpenseForm saveExpenseDataHandler={saveExpenseDataHandler} />;
 };
 
-export default NewExpense;
+export default NewProduct;

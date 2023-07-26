@@ -1,8 +1,7 @@
 import React, { Fragment } from "react";
-import "./ExpenseDate.css";
+import "./ProductDate.css";
 
 const ExpenseDate = (props) => {
-  console.log("🚀 ~ file: ExpenseDate.js:5 ~ ExpenseDate ~ props:", props);
   const { data } = props;
   const month = data.toLocaleString("en-US", { month: "long" });
   const day = data.getDate();

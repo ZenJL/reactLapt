@@ -1,6 +1,7 @@
 import { Send } from "@mui/icons-material";
 import { Box, Button, Container, Stack, TextField } from "@mui/material";
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
+import AuthContext from "../../context/AuthContext";
 
 const usernameReducer = (state, action) => {
   if (action.type === "USERNAME_INPUT_CHANGE") {
@@ -41,6 +42,9 @@ const Login = (props) => {
   // const [password, setPassword] = useState("");
   const [formIsValid, setFormIsValid] = useState(false);
 
+  // Context
+  const ctx = useContext(AuthContext);
+
   const [usernameState, usernameDispatcher] = useReducer(usernameReducer, {
     value: "",
     isValid: null,
@@ -55,7 +59,8 @@ const Login = (props) => {
   // const [isValidUsername, setIsValidUsername] = useState(true);
   // const [isValidPassword, setIsValidPassword] = useState(true);
 
-  const loginHandler = props?.loginHandler;
+  // const loginHandler = props?.loginHandler;
+  const loginHandler = ctx.login;
 
   const validateUsernameHandler = () => {
     // setIsValidUsername(username.trim().length !== 0);

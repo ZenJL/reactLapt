@@ -1,16 +1,15 @@
 import React, { Fragment, useState } from "react";
-import "./ExpenseItem.css";
-import ExpenseDate from "./ExpenseDate";
+import "./ProductItem.css";
+import ExpenseDate from "./ProductDate";
 import Card from "../UI/Card";
 
-const ExpenseItem = (props) => {
+const ProductItem = (props) => {
   const { listExpense } = props;
 
   const [title, setTitle] = useState(listExpense.title);
 
   const changeTitleFnc = () => {
     setTitle((prev) => prev + " 1");
-    console.log(`ExpenseItem.js: line 9 🐱‍🚀❄🐱‍🏍  ===> title`, title);
   };
 
   return (
@@ -29,4 +28,4 @@ const ExpenseItem = (props) => {
   );
 };
 
-export default ExpenseItem;
+export default ProductItem;
