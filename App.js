@@ -1,27 +1,61 @@
-// import logo from "./logo.svg";
-import "./App.css";
-import Product from "./components/Product/Product";
-import NewProduct from "./components/NewProduct/NewProduct";
 import { useEffect, useState } from "react";
-import Navigation from "./components/Navigation/Navigation";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import "./App.css";
 import Login from "./components/Login/Login";
-import AuthContext from "./context/AuthContext";
+import Navigation from "./components/Navigation/Navigation";
+import NewProduct from "./components/NewProduct/NewProduct";
+import Product from "./components/Product/Product";
+import ItemList from "./components/Shop/ItemList";
 import { DrawerHeader, Main } from "./components/UI/StyledMUI";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import AuthContext from "./context/AuthContext";
+import CartContext from "./context/CartContext";
 import ProtectedRoute from "./guard/ProtectedRoute";
+import CartProvider from "./context/CartProvider";
 
 const initialProduct = [
-  { id: 1, title: "Petrol Gas", amount: 2, date: new Date(2023, 7, 3) },
-  { id: 2, title: "Movie", amount: 10, date: new Date(2023, 10, 3) },
-  { id: 3, title: "Lunch", amount: 5, date: new Date(2023, 12, 3) },
+  {
+    id: 1,
+    title: "Superman: Action Comics",
+    amount: 12.99,
+    date: new Date(2023, 6, 17),
+    imageUrl: "./BOOK-COMIC-1000.jpg",
+    category: "C",
+  },
+  {
+    id: 2,
+    title: "Batman: The Silver Age Omnibus",
+    amount: 99.99,
+    date: new Date(2022, 6, 18),
+    imageUrl: "./BOOK-COMIC-1001.jpg",
+    category: "C",
+  },
+  {
+    id: 3,
+    title: "The Fifth Science",
+    amount: 24.99,
+    date: new Date(2022, 6, 19),
+    imageUrl: "./BOOK-FICTION-1002.jpg",
+    category: "F",
+  },
+  {
+    id: 4,
+    title: "The Summer House",
+    amount: 15.0,
+    date: new Date(2022, 6, 20),
+    imageUrl: "./BOOK-ROMANTIC-1003.jpg",
+    category: "R",
+  },
+  {
+    id: 5,
+    title: "The Art of Computer Programming",
+    amount: 187.99,
+    date: new Date(2023, 6, 20),
+    imageUrl: "./BOOK-PROGRAMMING-1004.jpg",
+    category: "P",
+  },
 ];
 
 function App() {
-  // let listExpense = [
-  //   { id: 1, title: "Petrol Gas", amount: 2, date: new Date(2023, 7, 3) },
-  //   { id: 2, title: "Movie", amount: 10, date: new Date(2023, 10, 3) },
-  //   { id: 3, title: "Lunch", amount: 5, date: new Date(2023, 12, 3) },
-  // ];
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [listExpense, setListExpense] = useState(initialProduct);
@@ -29,8 +63,9 @@ function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const addExpenseHandler = (expense) => {
+  const addProductHandler = (expense) => {
     setListExpense((prev) => [...prev, expense]);
   };
 
@@ -43,7 +78,10 @@ function App() {
       setIsLoggedIn(true);
       localStorage.setItem("isLoggedInStatus", "1");
 
-      navigate("/product");
+      // navigate("/product");
+      const origin = location.state?.from?.pathname || "/shop";
+
+      navigate(origin);
     } else {
       setIsLoggedIn(false);
     }
@@ -73,55 +111,40 @@ function App() {
         logout: logoutHandler,
       }}
     >
-      <Navigation
-        // logoutHandler={logoutHandler}
-        onDrawerOpen={setIsDrawerOpen}
-        isDrawerOpen={isDrawerOpen}
-      />
-      <Routes>
-        <Route element={<ProtectedRoute />}>
-          <Route
-            path="product"
-            element={
-              <Main open={isDrawerOpen}>
-                <DrawerHeader />
-                <NewProduct getValueApp={addExpenseHandler} />
-                <Product expense={listExpense}>
-                  {/* <ExpenseItem
-          title={listExpense[0].title}
-          amount={listExpense[0].amount}
-          date={listExpense[0].date}
-          listExpense={listExpense}
-        /> */}
-                </Product>
-              </Main>
-            }
-          />
-        </Route>
-
-        <Route index element={<Login />} />
-
-        {/* {isLoggedIn && (
-          <Main open={isDrawerOpen}>
-            <DrawerHeader />
-            <NewProduct getValueApp={addExpenseHandler} />
-            <Product expense={listExpense}>
-              <ExpenseItem
-          title={listExpense[0].title}
-          amount={listExpense[0].amount}
-          date={listExpense[0].date}
-          listExpense={listExpense}
+      <CartProvider>
+        <Navigation
+          onDrawerOpen={setIsDrawerOpen}
+          isDrawerOpen={isDrawerOpen}
         />
-            </Product>
-          </Main>
-        )} */}
+        <Routes>
+          <Route element={<ProtectedRoute />}>
+            <Route
+              path="product"
+              element={
+                <Main open={isDrawerOpen}>
+                  <DrawerHeader />
+                  <NewProduct getValueApp={addProductHandler} />
+                  <Product expense={listExpense}></Product>
+                </Main>
+              }
+            />
+            <Route
+              path="shop"
+              element={
+                <Main open={isDrawerOpen}>
+                  <DrawerHeader />
+                  <ItemList
+                    isDrawerOpen={isDrawerOpen}
+                    products={listExpense}
+                  />
+                </Main>
+              }
+            />
+          </Route>
 
-        {/* {!isLoggedIn && (
-          <Login
-          // loginHandler={loginHandler}
-          />
-        )} */}
-      </Routes>
+          <Route index element={<Login />} />
+        </Routes>
+      </CartProvider>
     </AuthContext.Provider>
   );
 }

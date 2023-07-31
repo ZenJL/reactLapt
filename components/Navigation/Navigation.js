@@ -1,25 +1,27 @@
-import * as React from "react";
-import { styled, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
-import MuiAppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
+import { ModeEdit, ShoppingCart } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import MenuIcon from "@mui/icons-material/Menu";
+import { Badge, Button } from "@mui/material";
+import MuiAppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import { Button } from "@mui/material";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { red } from "@mui/material/colors";
+import { styled, useTheme } from "@mui/material/styles";
+import * as React from "react";
+import { Link } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
+import ShoppingModal from "../Shop/ShoppingModal";
 import { DrawerHeader } from "../UI/StyledMUI";
 
 const drawerWidth = 240;
@@ -41,10 +43,42 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    backgroundColor: red[500],
+    color: "white",
+    right: -4,
+    padding: "0 4px",
+    border: `1px solid ${theme.palette.background.paper}`,
+  },
+}));
+
 export default function Navigation(props) {
   const theme = useTheme();
   const ctx = React.useContext(AuthContext);
   // const [open, setOpen] = React.useState(false);
+
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
+  const handleClickOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const menu = (index) => {
+    switch (index) {
+      case 0:
+        return "/product";
+      case 1:
+        return "/shop";
+
+      default:
+        return "/shop";
+    }
+  };
 
   const handleDrawerOpen = () => {
     props.onDrawerOpen(true);
@@ -71,8 +105,25 @@ export default function Navigation(props) {
                 <MenuIcon />
               </IconButton>
               <Typography sx={{ flex: 1 }} variant="h6" noWrap component="div">
-                Installer 2
+                My shop
               </Typography>
+
+              <IconButton
+                sx={{ marginRight: 2 }}
+                onClick={handleClickOpenModal}
+              >
+                <StyledBadge
+                  badgeContent={4}
+                  // sx={{
+                  //   "& .MuiBadge-badge": {
+                  //     color: "black",
+                  //     backgroundColor: red[500],
+                  //   },
+                  // }}
+                >
+                  <ShoppingCart sx={{ width: 28, height: 28, color: "#fff" }} />
+                </StyledBadge>
+              </IconButton>
 
               <Button
                 color="inherit"
@@ -107,22 +158,24 @@ export default function Navigation(props) {
             </DrawerHeader>
             <Divider />
             <List>
-              {["Inbox", "Starred", "Send email", "Drafts"].map(
-                (text, index) => (
-                  <ListItem key={text} disablePadding>
-                    <ListItemButton>
-                      <ListItemIcon>
-                        {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                      </ListItemIcon>
-                      <ListItemText primary={text} />
-                    </ListItemButton>
-                  </ListItem>
-                )
-              )}
+              {["Manage Product", "Shop"].map((text, index) => (
+                <ListItem key={text} disablePadding>
+                  <ListItemButton component={Link} to={menu(index)}>
+                    <ListItemIcon>
+                      {index % 2 === 0 ? <ModeEdit /> : <ShoppingCart />}
+                    </ListItemIcon>
+                    <ListItemText primary={text} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
             </List>
           </Drawer>
         </Box>
       )}
+      <ShoppingModal
+        isModalOpen={isModalOpen}
+        onCloseModal={handleCloseModal}
+      />
     </React.Fragment>
   );
 }
