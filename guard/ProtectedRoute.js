@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import AuthContext from "../context/AuthContext";
 
 const ProtectedRoute = () => {
   const location = useLocation();
+  const authContext = useContext(AuthContext);
 
-  if (localStorage.getItem("isLoggedInStatus") !== "1") {
+  if (!authContext.storeIsLoggedIn) {
     return <Navigate to="/" replace state={{ from: location }} />;
   }
 

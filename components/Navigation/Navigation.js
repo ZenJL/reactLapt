@@ -1,4 +1,8 @@
-import { ModeEdit, ShoppingCart } from "@mui/icons-material";
+import {
+  ModeEdit,
+  PersonAddAlt1Rounded,
+  ShoppingCart,
+} from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -21,6 +25,7 @@ import { styled, useTheme } from "@mui/material/styles";
 import * as React from "react";
 import { Link } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
+import CartContext from "../../context/CartContext";
 import ShoppingModal from "../Shop/ShoppingModal";
 import { DrawerHeader } from "../UI/StyledMUI";
 
@@ -56,7 +61,13 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 export default function Navigation(props) {
   const theme = useTheme();
   const ctx = React.useContext(AuthContext);
+  const cartContext = React.useContext(CartContext);
   // const [open, setOpen] = React.useState(false);
+
+  const numberOfCartItem = cartContext.items.reduce(
+    (acc, cur) => (acc += cur.qty),
+    0
+  );
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
@@ -74,9 +85,25 @@ export default function Navigation(props) {
         return "/product";
       case 1:
         return "/shop";
+      case 2:
+        return "/";
 
       default:
         return "/shop";
+    }
+  };
+
+  const mapIndexToIcon = (index) => {
+    switch (index) {
+      case 0:
+        return <ModeEdit />;
+      case 1:
+        return <ShoppingCart />;
+      case 2:
+        return <PersonAddAlt1Rounded />;
+
+      default:
+        return <ShoppingCart />;
     }
   };
 
@@ -113,7 +140,7 @@ export default function Navigation(props) {
                 onClick={handleClickOpenModal}
               >
                 <StyledBadge
-                  badgeContent={4}
+                  badgeContent={numberOfCartItem}
                   // sx={{
                   //   "& .MuiBadge-badge": {
                   //     color: "black",
@@ -125,6 +152,9 @@ export default function Navigation(props) {
                 </StyledBadge>
               </IconButton>
 
+              <Button color="inherit" onClick={props.onFetchProduct}>
+                Fetch
+              </Button>
               <Button
                 color="inherit"
                 //  onClick={props.logoutHandler}
@@ -158,16 +188,19 @@ export default function Navigation(props) {
             </DrawerHeader>
             <Divider />
             <List>
-              {["Manage Product", "Shop"].map((text, index) => (
-                <ListItem key={text} disablePadding>
-                  <ListItemButton component={Link} to={menu(index)}>
-                    <ListItemIcon>
-                      {index % 2 === 0 ? <ModeEdit /> : <ShoppingCart />}
-                    </ListItemIcon>
-                    <ListItemText primary={text} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
+              {["Manage Product", "Shop", "Register user"].map(
+                (text, index) => (
+                  <ListItem key={text} disablePadding>
+                    <ListItemButton component={Link} to={menu(index)}>
+                      <ListItemIcon>
+                        {/* {index % 2 === 0 ? <ModeEdit /> : <ShoppingCart />} */}
+                        {mapIndexToIcon(index)}
+                      </ListItemIcon>
+                      <ListItemText primary={text} />
+                    </ListItemButton>
+                  </ListItem>
+                )
+              )}
             </List>
           </Drawer>
         </Box>

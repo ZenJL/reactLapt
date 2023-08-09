@@ -1,5 +1,6 @@
+import { Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Login from "./components/Login/Login";
 import Navigation from "./components/Navigation/Navigation";
@@ -7,114 +8,115 @@ import NewProduct from "./components/NewProduct/NewProduct";
 import Product from "./components/Product/Product";
 import ItemList from "./components/Shop/ItemList";
 import { DrawerHeader, Main } from "./components/UI/StyledMUI";
-import AuthContext from "./context/AuthContext";
-import CartContext from "./context/CartContext";
-import ProtectedRoute from "./guard/ProtectedRoute";
+import AuthProvider from "./context/AuthProvider";
 import CartProvider from "./context/CartProvider";
-
-const initialProduct = [
-  {
-    id: 1,
-    title: "Superman: Action Comics",
-    amount: 12.99,
-    date: new Date(2023, 6, 17),
-    imageUrl: "./BOOK-COMIC-1000.jpg",
-    category: "C",
-  },
-  {
-    id: 2,
-    title: "Batman: The Silver Age Omnibus",
-    amount: 99.99,
-    date: new Date(2022, 6, 18),
-    imageUrl: "./BOOK-COMIC-1001.jpg",
-    category: "C",
-  },
-  {
-    id: 3,
-    title: "The Fifth Science",
-    amount: 24.99,
-    date: new Date(2022, 6, 19),
-    imageUrl: "./BOOK-FICTION-1002.jpg",
-    category: "F",
-  },
-  {
-    id: 4,
-    title: "The Summer House",
-    amount: 15.0,
-    date: new Date(2022, 6, 20),
-    imageUrl: "./BOOK-ROMANTIC-1003.jpg",
-    category: "R",
-  },
-  {
-    id: 5,
-    title: "The Art of Computer Programming",
-    amount: 187.99,
-    date: new Date(2023, 6, 20),
-    imageUrl: "./BOOK-PROGRAMMING-1004.jpg",
-    category: "P",
-  },
-];
+import ProtectedRoute from "./guard/ProtectedRoute";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const [listExpense, setListExpense] = useState(initialProduct);
-
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  const addProductHandler = async (product) => {
+    // setProducts((prevState) => {
+    //   return [...prevState, product];
+    // });
 
-  const addProductHandler = (expense) => {
-    setListExpense((prev) => [...prev, expense]);
+    const response = await fetch("http://localhost:8080/api/products/add", {
+      method: "POST",
+      body: JSON.stringify(product),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    fetchProductHandler();
   };
 
-  // Login
-  const loginHandler = ({ username = "", password = "" }) => {
-    // To-do: connect API & check username & password
-    // setIsLoggedIn(true);
+  // Fetch API
+  // const fetchProductHandler = () => {
+  //   fetch("http://localhost:8080/api/products")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       const productFromAPI = data?.products;
+  //       const transformedProduct = productFromAPI.map((item) => {
+  //         return {
+  //           ...item,
+  //           date: new Date(item.date),
+  //         };
+  //       });
+  //       setProducts(transformedProduct);
+  //     });
+  // };
 
-    if (username === "neko" && password === "123") {
-      setIsLoggedIn(true);
-      localStorage.setItem("isLoggedInStatus", "1");
+  // Async await
+  const fetchProductHandler = async () => {
+    setIsLoading(true);
+    setErrorMsg(null);
+    try {
+      const response = await fetch("http://localhost:8080/api/products");
+      const data = await response.json();
 
-      // navigate("/product");
-      const origin = location.state?.from?.pathname || "/shop";
-
-      navigate(origin);
-    } else {
-      setIsLoggedIn(false);
+      const transformedProduct = data?.products.map((item) => {
+        return {
+          ...item,
+          date: new Date(item.date),
+        };
+      });
+      setProducts(transformedProduct);
+    } catch (error) {
+      // console.log(`App.js: line 127 🐱‍🚀❄🐱‍🏍 error ===>`, error);
+      setErrorMsg(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Logout
-  const logoutHandler = () => {
-    setIsLoggedIn(false);
-    localStorage.removeItem("isLoggedInStatus");
+  // Register user
+  const addUserHandler = async (username, password) => {
+    try {
+      const response = await fetch("http://localhost:8080/api/user/register", {
+        method: "POST",
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    navigate("/");
+      const data = await response.json();
+      console.log(`App.js: line 161 🐱‍🚀❄🐱‍🏍 data ===>`, data);
+    } catch (error) {
+      // console.log(`App.js: line 127 🐱‍🚀❄🐱‍🏍 error ===>`, error);
+      setErrorMsg(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const itemLocalStorage = localStorage.getItem("isLoggedInStatus");
-
+  // Uef
   useEffect(() => {
-    if (itemLocalStorage === "1") {
-      setIsLoggedIn(true);
-    }
-  }, [itemLocalStorage]);
+    fetchProductHandler();
+  }, []);
 
   return (
-    <AuthContext.Provider
-      value={{
-        storeIsLoggedIn: isLoggedIn,
-        login: loginHandler,
-        logout: logoutHandler,
-      }}
-    >
+    // <AuthContext.Provider
+    //   value={{
+    //     storeIsLoggedIn: isLoggedIn,
+    //     login: loginHandler,
+    //     logout: logoutHandler,
+    //   }}
+    // >
+    <AuthProvider>
       <CartProvider>
         <Navigation
           onDrawerOpen={setIsDrawerOpen}
           isDrawerOpen={isDrawerOpen}
+          onFetchProduct={fetchProductHandler}
         />
         <Routes>
           <Route element={<ProtectedRoute />}>
@@ -124,7 +126,7 @@ function App() {
                 <Main open={isDrawerOpen}>
                   <DrawerHeader />
                   <NewProduct getValueApp={addProductHandler} />
-                  <Product expense={listExpense}></Product>
+                  <Product products={products}></Product>
                 </Main>
               }
             />
@@ -133,19 +135,24 @@ function App() {
               element={
                 <Main open={isDrawerOpen}>
                   <DrawerHeader />
-                  <ItemList
-                    isDrawerOpen={isDrawerOpen}
-                    products={listExpense}
-                  />
+                  {!isLoading && errorMsg && (
+                    <Typography>{errorMsg}</Typography>
+                  )}
+                  {isLoading && <Typography>Loading...</Typography>}
+
+                  {!isLoading && products.length > 0 && (
+                    <ItemList isDrawerOpen={isDrawerOpen} products={products} />
+                  )}
                 </Main>
               }
             />
           </Route>
 
-          <Route index element={<Login />} />
+          <Route index element={<Login onAddUser={addUserHandler} />} />
         </Routes>
       </CartProvider>
-    </AuthContext.Provider>
+    </AuthProvider>
+    // </AuthContext.Provider>
   );
 }
 
