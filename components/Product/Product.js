@@ -1,15 +1,13 @@
-import React, { useState } from "react";
-import ExpenseItem from "./ProductItem";
-import "./Product.css";
+import { useState } from "react";
 import Card from "../UI/Card";
+import "./Product.css";
 import ExpenseFilter from "./ProductFilter";
-import { Button } from "@mui/base";
-import { Box } from "@mui/material";
+import ExpenseItem from "./ProductItem";
 
 const Product = (props) => {
-  const { expense: dataList } = props;
+  const { products: dataList } = props;
 
-  const [dataShow, setDataShow] = useState(props.expense);
+  const [dataShow, setDataShow] = useState(props.products);
 
   const selectedYearHandle = (value) => {
     const newData = dataList?.filter(
@@ -19,7 +17,7 @@ const Product = (props) => {
   };
 
   const resetData = () => {
-    setDataShow(props.expense);
+    setDataShow(props.products);
   };
 
   return (

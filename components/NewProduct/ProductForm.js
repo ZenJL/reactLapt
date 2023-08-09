@@ -10,7 +10,7 @@ const ExpenseForm = (props) => {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
 
-  const [expense, setExpense] = useState({
+  const [product, setProduct] = useState({
     title: "",
     amount: "",
     inputDate: new Date(),
@@ -21,21 +21,21 @@ const ExpenseForm = (props) => {
   const [isValidAmount, setIsValidAmount] = useState(true);
   const [isValidDate, setIsValidDate] = useState(true);
 
-  const saveExpenseDataHandler = props?.saveExpenseDataHandler;
+  const saveProductDataHandler = props?.saveProductDataHandler;
 
   const titleChangeHandler = (e) => {
     setTitle(e.target.value);
-    // setExpense((prev) => ({ ...prev, title: e.target.value }));
+    // setProduct((prev) => ({ ...prev, title: e.target.value }));
   };
 
   const amountChangeHandler = (e) => {
     setAmount(e.target.value);
-    // setExpense((prev) => ({ ...prev, amount: e.target.value }));
+    // setProduct((prev) => ({ ...prev, amount: e.target.value }));
   };
 
   const dateChangeHandler = (date) => {
     setDate(date);
-    // setExpense((prev) => ({ ...prev, inputDate: date }));
+    // setProduct((prev) => ({ ...prev, inputDate: date }));
   };
 
   const handleChange = (newValue) => {
@@ -60,13 +60,13 @@ const ExpenseForm = (props) => {
       return;
     }
 
-    const expenseDate = {
+    const productDate = {
       title,
       amount: Number(amount),
       date,
     };
 
-    saveExpenseDataHandler(expenseDate);
+    saveProductDataHandler(productDate);
 
     setTitle("");
     setAmount("");
@@ -128,7 +128,7 @@ const ExpenseForm = (props) => {
             alignItems={"center"}
           >
             <Button type="submit" variant="contained" endIcon={<Send />}>
-              Add expense
+              Add product
             </Button>
           </Box>
         </LocalizationProvider>

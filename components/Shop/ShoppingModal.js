@@ -1,12 +1,12 @@
+import ControlPointOutlinedIcon from "@mui/icons-material/ControlPointOutlined";
+import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
 import {
-  Box,
   Button,
-  CardMedia,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -14,50 +14,34 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
 } from "@mui/material";
+import { useContext } from "react";
+import CartContext from "../../context/CartContext";
 
 const ShoppingModal = (props) => {
   const isModalOpen = props.isModalOpen;
   const onCloseModal = props.onCloseModal;
 
-  const cartItems = [
-    {
-      id: 1,
-      qty: 1,
-      title: "Superman: Action Comics",
-      price: 12.99,
-      imageUrl: "./BOOK-COMIC-1000.jpg",
-    },
-    {
-      id: 2,
-      qty: 2,
-      title: "Batman: The Silver Age Omnibus",
-      price: 99.99,
-      imageUrl: "./BOOK-COMIC-1001.jpg",
-    },
-    {
-      id: 3,
-      qty: 3,
-      title: "The Fifth Science",
-      price: 24.99,
-      imageUrl: "./BOOK-FICTION-1002.jpg",
-    },
-    {
-      id: 4,
-      qty: 5,
-      title: "The Summer House",
-      price: 15.0,
-      imageUrl: "./BOOK-ROMANTIC-1003.jpg",
-    },
-    {
-      id: 5,
-      qty: 6,
-      title: "The Art of Computer Programming",
-      price: 187.99,
-      imageUrl: "./BOOK-PROGRAMMING-1004.jpg",
-    },
-  ];
+  const cartContext = useContext(CartContext);
+
+  const cartItems = cartContext.items;
+
+  const addItemInModal = (cartItem) => {
+    return () =>
+      cartContext.addItem({
+        id: cartItem.id,
+        title: cartItem.title,
+        imageUrl: cartItem.imageUrl,
+        unit: cartItem.amount,
+        qty: 1,
+      });
+  };
+
+  const removeItemHandler = (cartItemId) => {
+    return () => {
+      cartContext.removeItem(cartItemId);
+    };
+  };
 
   const loadImage = require.context("../../assets/images", true);
 
@@ -65,78 +49,102 @@ const ShoppingModal = (props) => {
     <Dialog open={isModalOpen} onClose={onCloseModal} maxWidth="lg">
       <DialogTitle>Checkout</DialogTitle>
       <DialogContent>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 700 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Description</TableCell>
-                <TableCell>Quantity</TableCell>
-                <TableCell>Unit Price</TableCell>
-                <TableCell>Sum</TableCell>
-              </TableRow>
-            </TableHead>
+        {cartItems.length === 0 && <p>No item add</p>}
+        {cartItems.length > 0 && (
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 700 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Description</TableCell>
+                  <TableCell>Quantity</TableCell>
+                  <TableCell>Unit Amount</TableCell>
+                  <TableCell>Sum</TableCell>
+                </TableRow>
+              </TableHead>
 
-            <TableBody>
-              {cartItems.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell
-                    sx={{
-                      display: "flex",
-                      justifyContent: "flex-start",
-                      justifyItems: "center",
-                    }}
-                  >
-                    {/* <Box
+              <TableBody>
+                {cartItems?.map((row) => {
+                  return (
+                    <TableRow key={row.id}>
+                      <TableCell
+                        sx={{
+                          display: "flex",
+                          justifyContent: "flex-start",
+                          justifyItems: "center",
+                        }}
+                      >
+                        {/* <Box
                       component={"img"}
                       alt={row.title}
                       src={loadImage(row.imageUrl)}
                       height={63}
                       sx={{ objectFit: "contain", display: "block" }}
                     />{" "} */}
-                    <img
-                      height="50"
-                      width="50"
-                      src={loadImage(row.imageUrl)}
-                      alt={row.title}
-                      style={{ objectFit: "contain", display: "block" }}
-                    />
-                    <span style={{ alignSelf: "center" }}>{row.title}</span>
+                        <img
+                          height="50"
+                          width="50"
+                          src={loadImage(row.imageUrl)}
+                          alt={row.title}
+                          style={{ objectFit: "contain", display: "block" }}
+                        />
+                        <span style={{ alignSelf: "center" }}>{row.title}</span>
+                      </TableCell>
+                      <TableCell align="right">{row.qty}</TableCell>
+                      <TableCell align="right">{row.unit.toFixed(2)}</TableCell>
+                      <TableCell align="right">
+                        {(row.qty * row.unit).toFixed(2)}
+                      </TableCell>
+                      <TableCell align="right">
+                        <IconButton
+                          aria-label="increase-item"
+                          onClick={addItemInModal(row)}
+                        >
+                          <ControlPointOutlinedIcon />
+                        </IconButton>
+                        <IconButton
+                          aria-label="remove-item"
+                          onClick={removeItemHandler(row.id)}
+                        >
+                          <RemoveCircleOutlineOutlinedIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+
+                <TableRow>
+                  <TableCell colSpan={2} align="right">
+                    Total Qty
                   </TableCell>
-                  <TableCell align="right">{row.qty}</TableCell>
-                  <TableCell align="right">{row.price.toFixed(2)}</TableCell>
-                  <TableCell align="right">
-                    {(row.qty * row.price).toFixed(2)}
+                  <TableCell colSpan={2} align="right">
+                    Total amount
                   </TableCell>
                 </TableRow>
-              ))}
 
-              <TableRow>
-                <TableCell colSpan={2} align="right">
-                  Total Qty
-                </TableCell>
-                <TableCell colSpan={2} align="right">
-                  Total price
-                </TableCell>
-              </TableRow>
-
-              <TableRow>
-                <TableCell colSpan={2} align="right">
-                  {cartItems.reduce((acc, cur) => (acc += cur.qty), 0)}
-                </TableCell>
-                <TableCell colSpan={2} align="right">
-                  $
-                  {cartItems.reduce((acc, cur) => {
-                    return (acc += cur.qty * cur.price);
-                  }, 0)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+                <TableRow>
+                  <TableCell colSpan={2} align="right">
+                    {cartItems?.reduce((acc, cur) => (acc += cur.qty), 0)}
+                  </TableCell>
+                  <TableCell colSpan={2} align="right">
+                    $
+                    {cartItems
+                      ?.reduce((acc, cur) => {
+                        acc += cur.qty * cur.unit;
+                        return acc;
+                      }, 0)
+                      .toFixed(2)}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onCloseModal}>Cancel</Button>
-        <Button onClick={onCloseModal}>Subscribe</Button>
+        <Button disabled={cartItems.length < 1} onClick={onCloseModal}>
+          Order
+        </Button>
       </DialogActions>
     </Dialog>
   );

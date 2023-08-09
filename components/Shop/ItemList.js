@@ -1,7 +1,7 @@
+import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import ItemCard from "./ItemCard";
-import { Typography } from "@mui/material";
 
 export default function ItemList(props) {
   const isDrawerOpen = props.isDrawerOpen;
