@@ -15,14 +15,19 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import CartContext from "../../context/CartContext";
+import Checkout from "./Checkout";
+import AuthContext from "../../context/AuthContext";
 
 const ShoppingModal = (props) => {
   const isModalOpen = props.isModalOpen;
   const onCloseModal = props.onCloseModal;
 
+  const [isCheckout, setIsCheckout] = useState(false);
+
   const cartContext = useContext(CartContext);
+  const authContext = useContext(AuthContext);
 
   const cartItems = cartContext.items;
 
@@ -32,7 +37,7 @@ const ShoppingModal = (props) => {
         id: cartItem.id,
         title: cartItem.title,
         imageUrl: cartItem.imageUrl,
-        unit: cartItem.amount,
+        unit: cartItem.unit,
         qty: 1,
       });
   };
@@ -41,6 +46,37 @@ const ShoppingModal = (props) => {
     return () => {
       cartContext.removeItem(cartItemId);
     };
+  };
+
+  const checkoutHandler = async (info = {}) => {
+    try {
+      const response = await fetch("localhost:8080/api/checkout", {
+        method: "POST",
+        body: JSON.stringify({
+          ...info,
+          total: cartContext.totalAmount,
+          items: [...cartContext.items],
+        }),
+        Headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authContext.token}`,
+        },
+      });
+
+      const data = response.json();
+
+      if (response.ok) {
+        console.log(`ShoppingModal.js: line 69 🐱‍🚀❄🐱‍🏍 data ===>`, data);
+        setIsCheckout(false);
+        onCloseModal();
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.log(`ShoppingModal.js: line 53 🐱‍🚀❄🐱‍🏍 error ===>`, error);
+      setIsCheckout(false);
+      onCloseModal();
+    }
   };
 
   const loadImage = require.context("../../assets/images", true);
@@ -139,10 +175,14 @@ const ShoppingModal = (props) => {
             </Table>
           </TableContainer>
         )}
+        {isCheckout && <Checkout onCheckout={checkoutHandler} />}
       </DialogContent>
       <DialogActions>
         <Button onClick={onCloseModal}>Cancel</Button>
-        <Button disabled={cartItems.length < 1} onClick={onCloseModal}>
+        <Button
+          disabled={cartItems.length < 1}
+          onClick={() => setIsCheckout(true)}
+        >
           Order
         </Button>
       </DialogActions>

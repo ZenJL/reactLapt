@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Card from "../UI/Card";
 import "./Product.css";
-import ExpenseFilter from "./ProductFilter";
-import ExpenseItem from "./ProductItem";
+import ProductFilter from "./ProductFilter";
+import ProductItem from "./ProductItem";
 
 const Product = (props) => {
   const { products: dataList } = props;
@@ -22,7 +22,7 @@ const Product = (props) => {
 
   return (
     <Card className="expenses">
-      <ExpenseFilter
+      <ProductFilter
         selectedYearHandle={selectedYearHandle}
         resetData={resetData}
       />
@@ -30,7 +30,7 @@ const Product = (props) => {
         //props.expense
         dataShow.length > 0 ? (
           dataShow.map((item, idx) => (
-            <ExpenseItem key={item.id} listExpense={item} />
+            <ProductItem key={item.id} listExpense={item} />
           ))
         ) : (
           <h1

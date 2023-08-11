@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import { Button } from "@mui/material";
 import Box from "@mui/material/Box";
+import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { Button } from "@mui/material";
+import { useState } from "react";
 
-const ExpenseFilter = (props) => {
+const ProductFilter = (props) => {
   const { selectedYearHandle, resetData } = props;
 
   const [year, setYear] = useState("");
@@ -65,4 +65,4 @@ const ExpenseFilter = (props) => {
   );
 };
 
-export default ExpenseFilter;
+export default ProductFilter;

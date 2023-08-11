@@ -1,9 +1,23 @@
-import React, { useState } from "react";
+import jwtDecode from "jwt-decode";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthContext from "./AuthContext";
 
+const validateAndGetTokenFromLocalStorage = () => {
+  if (localStorage.getItem("token")) {
+    const storedToken = localStorage.getItem("token");
+    const decodedStoredToken = jwtDecode(storedToken);
+    if (decodedStoredToken.exp * 1000 - new Date().getTime() < 0) {
+      localStorage.removeItem("token");
+      return null;
+    }
+    return storedToken;
+  }
+};
+
 const AuthProvider = (props) => {
-  const initialToken = localStorage.getItem("token");
+  const initialToken = validateAndGetTokenFromLocalStorage();
+  let logoutTimer;
 
   // const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [token, setToken] = useState(initialToken);
@@ -33,6 +47,20 @@ const AuthProvider = (props) => {
         localStorage.setItem("token", data.token);
         setToken(data.token);
 
+        let decodedToken = jwtDecode(data.token);
+        console.log(
+          "🚀 ~ file: AuthProvider.js:38 ~ loginHandler ~ decodedToken:",
+          decodedToken
+        );
+        const remainingTimeBeforeTokenExpire =
+          decodedToken.exp * 1000 - new Date().getTime();
+        // console.log(
+        //   `AuthProvider.js: line 43 🐱‍🚀❄🐱‍🏍 remainingTime ===>`,
+        //   remainingTimeBeforeTokenExpire / 1000 / 60 / 60 / 24
+        // );
+
+        logoutTimer = setTimeout(logoutHandler, remainingTimeBeforeTokenExpire);
+
         const origin = location.state?.from?.pathname || "/shop";
 
         navigate(origin);
@@ -55,11 +83,22 @@ const AuthProvider = (props) => {
     // }
   };
 
-  const logoutHandler = () => {
+  const logoutHandler = useCallback(() => {
     localStorage.removeItem("token");
+    if (logoutTimer) {
+      clearTimeout(logoutTimer);
+    }
     setToken(null);
     navigate("/");
-  };
+  }, [logoutTimer, navigate]);
+
+  useEffect(() => {
+    if (initialToken) {
+      let decodedTokenUef = jwtDecode(initialToken);
+      const remainBeforeExp = decodedTokenUef.exp * 1000 - new Date().getTime();
+      setTimeout(logoutHandler, remainBeforeExp);
+    }
+  }, [initialToken, logoutHandler]);
 
   return (
     <AuthContext.Provider

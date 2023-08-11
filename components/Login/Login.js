@@ -1,6 +1,6 @@
 import { Send } from "@mui/icons-material";
-import { Box, Button, Container, Stack, TextField } from "@mui/material";
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import { Box, Button, Stack, TextField } from "@mui/material";
+import { useContext, useReducer, useState } from "react";
 import AuthContext from "../../context/AuthContext";
 
 const usernameReducer = (state, action) => {

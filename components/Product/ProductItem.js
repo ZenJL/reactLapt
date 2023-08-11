@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from "react";
 import "./ProductItem.css";
-import ExpenseDate from "./ProductDate";
+import ProductDate from "./ProductDate";
 import Card from "../UI/Card";
 
 const ProductItem = (props) => {
@@ -17,7 +17,7 @@ const ProductItem = (props) => {
       <Card className="expense-item">
         {/* <div>{item.date.toDateString()}</div> */}
 
-        <ExpenseDate data={listExpense.date}></ExpenseDate>
+        <ProductDate data={listExpense.date}></ProductDate>
         <div className="expense-item__description">
           <h3>{title}</h3>
           <h2 className="expense-item__price">${listExpense.amount}</h2>

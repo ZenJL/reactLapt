@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import { useReducer } from "react";
 import CartContext from "./CartContext";
 
 const cartReducer = (state, action) => {
@@ -20,6 +20,10 @@ const cartReducer = (state, action) => {
     }
 
     const updatedTotalAmount = state.totalAmount + action.payload.unit; /// because we plus only 1 qty
+    console.log(
+      "🚀 ~ file: CartProvider.js:23 ~ cartReducer ~ updatedTotalAmount:",
+      updatedTotalAmount
+    );
     return { items: updatedCarts, totalAmount: updatedTotalAmount };
   }
 
@@ -42,6 +46,11 @@ const cartReducer = (state, action) => {
     }
 
     const updatedTotalAmount = state.totalAmount - existingItem.unit;
+    console.log(
+      `CartProvider.js: line 46 🐱‍🚀❄🐱‍🏍 updatedTotalAmount ===>`,
+      updatedTotalAmount
+    );
+
     return { items: updatedCarts, totalAmount: updatedTotalAmount };
   }
 };
